@@ -20,24 +20,19 @@ const users = [
   },
 ];
 
-const UserGenderArray = (users) => {
-  const usersGroupedByGender = {
-    women: [],
-    men: [],
-  };
-
-  users.forEach((user) => {
+const groupUsersByGender = (users) => {
+  return users.reduce((genderUsersObject, user) => {
     const { first_name, last_name, ...userUpd } = user;
+    const gender = userUpd.gender;
     userUpd.fullName = `${first_name} ${last_name}`;
 
-    if (user.gender === "female") {
-      usersGroupedByGender.women.push(userUpd);
-    } else {
-      usersGroupedByGender.men.push(userUpd);
+    if (!(gender in genderUsersObject)) {
+      genderUsersObject[gender] = [];
     }
-  });
+    genderUsersObject[gender].push(userUpd);
 
-  return usersGroupedByGender;
+    return genderUsersObject;
+  }, {});
 };
 
 // Task 2
@@ -62,10 +57,10 @@ const videos = [
   },
 ];
 
-const ArrayToObject = (array) => {
-  return array.reduce((resArr, object) => {
-    resArr[object.id] = object.title;
-    return resArr;
+const createVideosIdTitleMap = (videosArray) => {
+  return videosArray.reduce((videosIdTitleMap, video) => {
+    videosIdTitleMap[video.id] = video.title;
+    return videosIdTitleMap;
   }, {});
 };
 
@@ -107,12 +102,12 @@ const newReleases = [
   },
 ];
 
-const bestReleases = (releasesArray) => {
-  const selectedReleases = [];
-  releasesArray.forEach((obj) =>
-    obj.rating[0] === 5.0 ? selectedReleases.push(obj.id) : null
+const findTopRaitedRealeses = (releasesArray) => {
+  const topRaitedRealeses = [];
+  releasesArray.forEach((release) =>
+    release.rating[0] === 5.0 ? topRaitedRealeses.push(release.id) : null
   );
-  return selectedReleases;
+  return topRaitedRealeses;
 };
 
 // Task 4
@@ -141,13 +136,12 @@ const boxarts = [
   },
 ];
 
-const getBiggestArea = (boxArray) => {
-  return boxArray.reduce((biggestObj, obj) => {
-    biggestObj =
-      biggestObj.width * biggestObj.height > obj.width * obj.height
-        ? biggestObj
-        : obj;
-    return biggestObj;
+const getBiggestArea = (boxesArray) => {
+  return boxesArray.reduce((biggestBox, box) => {
+    let biggestArea = biggestBox.width * biggestBox.height;
+    let calculatedArea = box.width * box.height;
+    biggestBox = biggestArea > calculatedArea ? biggestBox : box;
+    return biggestBox;
   }).url;
 };
 
@@ -163,14 +157,7 @@ const convertValues = (valArray) =>
 /* Написать функцию, которая принимает в себя 2 массива, а возвращает один, состоящий из 2ух, которые пришли в нее */
 
 const joinArrays = (arr1, arr2) => {
-  // Check lenght of each array, add values (do push) to the biggest array to decrease number of iterations for forEach
-  if (arr1.length > arr2.length) {
-    arr2.forEach((val) => arr1.push(val));
-    return arr1;
-  } else {
-    arr1.forEach((val) => arr2.push(val));
-    return arr2;
-  }
+  return arr1.concat(arr2);
 };
 
 // Task 7
@@ -182,10 +169,9 @@ const cutString = (string, symbols) => {
     return "Error, the first argument should be of type string and 2nd - of type integer";
   }
 
-  let stringAsArray = string.split("");
-  if (stringAsArray.length > symbols) {
-    stringAsArray = stringAsArray.slice(0, symbols);
-    return `${stringAsArray.join("")}...`;
+  if (string.length > symbols) {
+    let cuttedString = string.slice(0, symbols);
+    return `${cuttedString}...`;
   } else {
     return string;
   }
